@@ -12,12 +12,9 @@ headers = {
     "Authorization": f"Bearer {HUGGINGFACE_TOKEN}"
 }
 
-st.set_page_config(page_title="EduChat - HuggingFace", layout="centered")
-st.title("📘 EduChat - Chapter Simplifier (Hugging Face)")
-st.markdown("Explain chapters in simple terms for 9th and 10th standard teachers.")
-
-grade = st.sidebar.selectbox("Select Grade", ["9th", "10th"])
-subject = st.sidebar.selectbox("Select Subject", ["Science", "Math", "Social Science", "English", "Hindi"])
+st.set_page_config(page_title="EduChat - Essay Title Generator", layout="centered")
+st.title("✍️ EduChat - Essay Title Generator (Hugging Face)")
+st.markdown("Provide the essay content, and get a suitable title suggestion for it.")
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -29,27 +26,27 @@ def query_huggingface(payload):
     else:
         return f"❌ Error: {response.status_code} - {response.text}"
 
-def generate_prompt(chapter_detail):
-    return f"""You are an assistant helping school teachers. Given the chapter detail, provide a simple explanation suitable for a teacher teaching grade {grade} {subject}:
+def generate_prompt(essay_content):
+    return f"""You are an assistant helping people generate suitable titles for essays. Given the essay content, provide a creative and concise title that represents the main theme of the essay:
 
-Chapter Detail:
-{chapter_detail}
+Essay Content:
+{essay_content}
 
-Explanation (keep it short, clear, and suitable for students):
+Suggested Title:
 """
 
-user_input = st.text_input("Enter the chapter details...")
+user_input = st.text_area("Enter the essay content...")
 
-if st.button("Explain"):
+if st.button("Generate Title"):
     if user_input:
         st.session_state.messages.append(("user", user_input))
-        with st.spinner("Generating explanation..."):
+        with st.spinner("Generating title..."):
             prompt = generate_prompt(user_input)
             output = query_huggingface({"inputs": prompt})
         st.session_state.messages.append(("bot", output))
     else:
-        st.warning("Please enter some chapter details!")
+        st.warning("Please enter some essay content!")
 
 # Display chat
 for sender, msg in st.session_state.messages:
-    st.markdown(f"**{'🧑‍🏫 You' if sender == 'user' else '🤖 EduChat'}:** {msg}")
+    st.markdown(f"**{'📝 You' if sender == 'user' else '🤖 EduChat'}:** {msg}")
